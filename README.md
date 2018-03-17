@@ -37,10 +37,29 @@ inView('.someSelector')
 
 ## API
 
-in-view maintains a separate handler registry for each set of elements captured with `inView(<selector>)`. Each registry exposes the same four methods. in-view also exposes four top-level methods. (`is`, `offset`, `threshold`, `test`).
+in-view maintains a separate handler registry for each set of elements captured with `inView(<selector>, [options])`. 
+allows individual options per selector. If selector exists with different options, it generates a new one instead of overriding it.
+Each registry exposes the following properties:
 
-### inView(\<selector>).on(\<event>, \<handler>)
+- `options`
+- `elements`
+- `handlers` All handlers.
+- `singles` The handlers that to be fired once and removed.
+
+and methods:
+
+- `on(<event>, <handler>)` Register a handler for event, to be fired for every event.
+- `once(<event>, <handler>)` Register a handler for event, to be fired once and removed.
+- `emit(<event>, <element>)` Emit event on given element. Used mostly internally, but could be useful for users.
+- `offset([value])` Mutate the offset object with either an object or a number.
+- `threshold([value])` Set the threshold with a number.
+- `check()` Check each element in the registry, if an element changes states, fire an event and operate on current.
+- `test(fn)` Use a custom test, overriding inViewport, to determine element visibility.
+
+### inView(\<selector>, [options]).on(\<event>, \<handler>)
 > Register a handler to the elements selected by `selector` for `event`. The only events in-view emits are `'enter'` and `'exit'`.
+
+- selector: CSS Selector, Node, NodeList, Array<Node>.
 
 > ```js
 > inView('.someSelector').on('enter', doSomething);
@@ -53,39 +72,20 @@ in-view maintains a separate handler registry for each set of elements captured 
 > inView('.someSelector').once('enter', doSomething);
 > ```
 
+### inView(\<selector>).off(\<event>)
+> Deregister all handlers for an event
+
+> ```js
+> var reg = inView('.someSelector').on('enter', doSomething);
+> reg.off('enter');
+> ```
+
 ### inView.is(\<element>)
 > Check if `element` is in the viewport.
 
 > ```js
 > inView.is(document.querySelector('.someSelector'));
 > // => true
-> ```
-
-### inView.offset(\<offset>)
-> By default, in-view considers something in viewport if it breaks any edge of the viewport. This can be used to set an offset from that edge. For example, an offset of `100` will consider elements in viewport if they break any edge of the viewport by at least `100` pixels. `offset` can be a positive or negative integer.
-
-> ```js
-> inView.offset(100);
-> inView.offset(-50);
-> ```
-
-> Offset can also be set per-direction by passing an object.
-
-> ```js
-> inView.offset({
->     top: 100,
->     right: 75,
->     bottom: 50,
->     left: 25
-> });
-> ```
-
-### inView.threshold(\<threshold>)
-> Set the ratio of an element's height **and** width that needs to be visible for it to be considered in viewport. This defaults to `0`, meaning any amount. A threshold of `0.5` or `1` will require that half or all, respectively, of an element's height and width need to be visible. `threshold` must be a number between `0` and `1`.
-> ```js
-> inView.threshold(0);
-> inView.threshold(0.5);
-> inView.threshold(1);
 > ```
 
 ### inView.test(\<test>)
