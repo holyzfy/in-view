@@ -26,7 +26,7 @@ npm install --save in-view
 With in-view, you can register handlers that are called when an element **enters** or **exits** the viewport. Each handler receives one element, the one entering or exiting the viewport, as its only argument.
 
 ```js
-inView('.someSelector')
+inView('.someSelector', options)
     .on('enter', doSomething)
     .on('exit', el => {
         el.style.opacity = 0.5;
@@ -38,10 +38,42 @@ inView('.someSelector')
 ## API
 
 in-view maintains a separate handler registry for each set of elements captured with `inView(<selector>, [options])`. 
-allows individual options per selector. If selector exists with different options, it generates a new one instead of overriding it.
-Each registry exposes the following properties:
+allows individual options per selector. If selector exists with different options, it generates a new one instead of overriding it. Each registry exposes the following properties:
 
-- `options`
+- `options.offset` 
+
+    By default, in-view considers something in viewport if it breaks any edge of the viewport. This can be used to set an offset from that edge. For example, an offset of `100` will consider elements in viewport if they break any edge of the viewport by at least `100` pixels. `offset` can be a positive or negative integer.
+
+    ```js
+    inView('.someSelector', {offset: 100}).on('enter', doSomething);
+    inView('.someSelector', {offset: -50}).on('enter', doSomething);
+    ```
+
+    Offset can also be set per-direction by passing an object.
+
+    ```js
+    var options = {
+        offset: {
+            top: 70,
+            right: 75,
+            bottom: 50,
+            left: 25;
+        }
+    };
+    inView('.someSelector', options).on('enter', doSomething);
+    ```
+
+- `options.threshold` 
+
+    Set the ratio of an element's height **and** width that needs to be visible for it to be considered in viewport. This defaults to `0`, meaning any amount. A threshold of `0.5` or `1` will require that half or all, respectively, of an element's height and width need to be visible. `threshold` must be a number between `0` and `1`.
+    
+    ```js
+    inView('.someSelector', {threshold: 0}).on('enter', doSomething);
+    inView('.someSelector', {threshold: 0.5}).on('enter', doSomething);
+    inView('.someSelector', {threshold: 1}).on('enter', doSomething);
+    ```
+
+- `options.test` A custom test to determine element visibility.
 - `elements`
 - `handlers` All handlers.
 - `singles` The handlers that to be fired once and removed.
