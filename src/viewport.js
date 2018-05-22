@@ -5,6 +5,12 @@
 export function inViewport (element, options) {
 
     const { top, right, bottom, left, width, height } = element.getBoundingClientRect();
+    const total = top + right + bottom + left + width + height;
+
+    // If the total amount of properties is 0, the element is hidden
+    if (total === 0) {
+        return false;
+    }
 
     const intersection = {
         t: bottom,
